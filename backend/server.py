@@ -23,16 +23,13 @@ def get_time():
         }
 
 # Route for receiving data from frontend... tbd on frontend side
-@app.route('/submit', methods=['POST'])
-def submit_data():
+@app.route('/submit_location', methods=['POST'])
+def submit_location():
     data = request.get_json()  # Get JSON data from request
     
-    # Process the data (here we just print it)
-    print("Received data:", data)
-    
     # You can access specific fields like:
-    name = data.get('name')
-    email = data.get('email')
+    name = data.get('latitude')
+    email = data.get('longitude')
     
     # Return a response
     return jsonify({
