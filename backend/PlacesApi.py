@@ -8,7 +8,8 @@ PLACES_API_KEY = os.getenv("GOOGLE_MAPS_API_TOKEN")
 if PLACES_API_KEY is None:
     raise ValueError("GOOGLE_MAPS_API_TOKEN not set in .env")
 
-def main(latitude=37.8708393, longitude=-122.272863, radius=500.0):
+def main(latitude, longitude, radius=1000.0):
+
     url = "https://places.googleapis.com/v1/places:searchNearby"
 
     headers = {
@@ -19,7 +20,7 @@ def main(latitude=37.8708393, longitude=-122.272863, radius=500.0):
 
     payload = {
         "includedTypes": ["restaurant"],
-        "maxResultCount": 10,
+        "maxResultCount": 20,
         "locationRestriction": {
             "circle": {
                 "center": {
@@ -38,8 +39,12 @@ def main(latitude=37.8708393, longitude=-122.272863, radius=500.0):
         print("Error:", response.status_code, data)
         return
 
-    # Print restaurant names
-    for place in data.get("places", []):
-        print(place["displayName"]["text"], "-", place.get("formattedAddress", "N/A"))
+    # Adding to dictionary.
+    result = {}
 
-main()
+    for place in data.get("places", []):
+        result[place["displayName"]["text"]] = place.get("formattedAddress", "N/A")
+
+    return result
+
+print(main(37.867359, -122.258377))
