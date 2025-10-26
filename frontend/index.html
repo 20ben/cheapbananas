@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <script src="https://ajax.googleapis.com/ajax/libs/handlebars/4.7.7/handlebars.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
     <style>
@@ -807,6 +808,14 @@
           });
         }
 
+        // Function to fetch data.
+        const fetchDataBtn = document.getElementById('fetchBtn')
+        fetchDataBtn.addEventListener('click', () => {
+          const res = axios.get("http://127.0.0.1:5000/api/data")
+              .then(res => console.log(res.data))
+              .catch(err => console.error(err));
+        });
+
         // Recenter map on user location
         const locButton = document.getElementById('currentLocationBtn');
         locButton.addEventListener('click', () => {
@@ -1040,6 +1049,7 @@
             <button class="button" id="currentLocationBtn">
               <img src="https://fonts.gstatic.com/s/i/googlematerialicons/home/v11/24px.svg" alt="current location"/>
             </button>
+            <button id="fetchBtn">Get Data from Flask (TESTING)</button>
 
           </div>
         </header>

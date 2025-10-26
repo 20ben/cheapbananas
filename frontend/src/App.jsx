@@ -17,43 +17,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
 export default function App() {
 
-  const [data] = useState(null);
-  const [showPopup] = useState(false);
-
-  // Fetch data from Flask
-  const fetchData = async () => {
-    try {
-      const res = await axios.get("http://127.0.0.1:5000/api/data");
-      setData(res.data);
-      setShowPopup(true); // show popup after fetching
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const closePopup = () => setShowPopup(false);
-
   return (
-
-    // popup stuff that we can delete later, for testing purposes
     <div>
-          <div>
-      <h1>Flask ↔ React Popup Demo</h1>
-      <button onClick={fetchData}>Get Data from Flask</button>
-
-      {showPopup && (
-        <div style={popupOverlayStyle}>
-          <div style={popupStyle}>
-            <h2>Data from Flask</h2>
-            <pre>{JSON.stringify(data, null, 2)}</pre>
-            <button onClick={closePopup}>Close</button>
-          </div>
-        </div>
-      )}
-    </div>
-    
-
-
       <h1>CheapBananas Map</h1>
       <MapView />
     </div>
