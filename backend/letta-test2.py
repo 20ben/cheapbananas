@@ -22,9 +22,9 @@ if MINION_ID2 is None:
     raise ValueError("MINION_ID2 environment variable not set")
 
 
-# READER_ID = os.environ.get('READER_ID')
-# if READER_ID is None:
-#     raise ValueError("READER_ID environment variable not set")
+READER_ID = os.environ.get('READER_ID')
+if READER_ID is None:
+    raise ValueError("READER_ID environment variable not set")
 
 
 async def run_minion_async(minion_id, data):
@@ -69,5 +69,8 @@ for minion_id, data in zip(MINION_IDS, FAKE_DATA):
 # Wait for all threads
 for t in threads:
     t.join()
+
+reader = AsyncLettaMinion(LETTA_API_TOKEN, READER_ID)
+print(reader.)
 
 print("All 8 minions connected and data saved!")

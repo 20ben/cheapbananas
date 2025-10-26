@@ -50,7 +50,7 @@ class AsyncLettaReader:
         
         # Use await for the asynchronous client call
         response = await self.client.agents.messages.create(
-            agent_id=self.agent_state.id,
+            agent_id=self.AGENT_ID,
             messages=[
         {
             "role": "system",
