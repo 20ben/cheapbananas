@@ -18,33 +18,40 @@ CORS(app)
 def output_deals():
 
     # Letta agent call here...
-    fake_data = {
-    'name': "Insomnia Cookies",
-    'lat': 37.8, 
-    'lng': -122.448,
-    'deals': [
-        {
-            "Deal Type": "Double Dozen Deal",
-            "Description": "24 Classic Cookies",
-            "Price/Discount": "$22",
-            "Availability": "Pickup Only",
-            "Source": "https://instagram.com"
-        },
-        {
-            "Deal Type": "Cookiewich",
-            "Description": "Ice Cream Sandwich",
-            "Price/Discount": "$4",
-            "Availability": "Pickup Only",
-            "Source": "https://instagram.com"
-        },
-        {
-            "Deal Type": "Free Cookie On Signup",
-            "Description": "Free classic cookie on signup",
-            "Price/Discount": "Free on signup",
-            "Availability": "Online Order",
-            "Source": "https://instagram.com"
-        }]
-    }
+    # fake_data = {
+    # 'name': "Insomnia Cookies",
+    # 'lat': 37.8, 
+    # 'lng': -122.448,
+    # 'deals': [
+    #     {
+    #         "Deal Type": "Double Dozen Deal",
+    #         "Description": "24 Classic Cookies",
+    #         "Price/Discount": "$22",
+    #         "Availability": "Pickup Only",
+    #         "Source": "https://instagram.com"
+    #     },
+    #     {
+    #         "Deal Type": "Cookiewich",
+    #         "Description": "Ice Cream Sandwich",
+    #         "Price/Discount": "$4",
+    #         "Availability": "Pickup Only",
+    #         "Source": "https://instagram.com"
+    #     },
+    #     {
+    #         "Deal Type": "Free Cookie On Signup",
+    #         "Description": "Free classic cookie on signup",
+    #         "Price/Discount": "Free on signup",
+    #         "Availability": "Online Order",
+    #         "Source": "https://instagram.com"
+    #     }]
+    # }
+
+    fake_data = [
+        {'lat': 37.800000, 'lng': -122.448000},
+        {'lat': 37.805000, 'lng': -122.464000},
+        {'lat': 37.810000, 'lng': -122.478000},
+    ]
+
 
     # Returning an api for showing in  reactjs
     return jsonify(fake_data)
