@@ -1023,21 +1023,54 @@
             <button class="close-button" id="closeDetail">×</button>
           </div>
           <img class="detail-image" src="${loc.imageUrl}">
-          <div class="detail-body">
-            <div class="detail-item">
-              <span class="detail-label">Address:</span>
-              <span class="detail-value">${loc.address}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Hours:</span>
-              <span class="detail-value">${loc.hours}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Rating:</span>
-              <span class="detail-value">${loc.rating}</span>
-            </div>
-          </div>
-        `;
+          `
+          if (loc.deals) {
+            const dealsDiv = document.createElement('div');
+            dealsDiv.className = 'detail-item';
+            dealsDiv.innerHTML = `
+              <div class="detail-body" type="overflow-y:scroll">
+                <div class="detail-item">
+                  <span class="detail-label">Address:</span>
+                  <span class="detail-value">${loc.address}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Hours:</span>
+                  <span class="detail-value">${loc.hours}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Rating:</span>
+                  <span class="detail-value">${loc.rating}</span>
+                </div>
+                <div class="detail-deals"
+                  <span class="detail-label">Deals:</span>
+                  <span class="detail-value">${loc.deals}</span>
+                </div>
+              </div>
+            `;
+            detailContent.appendChild(dealsDiv);
+          }
+          else {
+            const dealsDiv = document.createElement('div');
+            dealsDiv.className = 'detail-item';
+            dealsDiv.innerHTML = `
+              <div class="detail-body" type="overflow-y:scroll">
+                <div class="detail-item">
+                  <span class="detail-label">Address:</span>
+                  <span class="detail-value">${loc.address}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Hours:</span>
+                  <span class="detail-value">${loc.hours}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Rating:</span>
+                  <span class="detail-value">${loc.rating}</span>
+                </div>
+              </div>
+            `;
+          }
+        ;
+        
 
         document.getElementById("closeDetail").onclick = () => {
           detailPanel.classList.add("hidden");
@@ -1140,7 +1173,8 @@
                   address: loc[1], // formattedAddress from your API
                   hours: loc[4],
                   rating: loc[3],
-                  imageUrl: loc[5]
+                  imageUrl: loc[5],
+                  deals: loc[7]
                 };
 
                 // Add to locationData array
