@@ -21,9 +21,9 @@ class AsyncLettaReader:
         try:
             # Use await for the asynchronous client call
             self.agent_state = await self.client.agents.retrieve(self.AGENT_ID)
-            print("connected to agent")
+            print("connected to reader")
         except Exception as e:
-            print(f"Error retrieving agent {e}")
+            print(f"Error retrieving reader {e}")
 
     # Define method as asynchronous
     async def system_message(self, msgContent):
@@ -46,7 +46,7 @@ class AsyncLettaReader:
 
     
     # Define method as asynchronous
-    async def query_deals(self, place_name, place_location):
+    async def read_deals(self, place_name, place_location):
         
         # Use await for the asynchronous client call
         response = await self.client.agents.messages.create(

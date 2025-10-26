@@ -21,9 +21,9 @@ class AsyncLettaMinion:
         try:
             # Use await for the asynchronous client call
             self.agent_state = await self.client.agents.retrieve(self.AGENT_ID)
-            print("connected to agent")
+            print("connected to minion")
         except Exception as e:
-            print(f"Error retrieving agent {e}")
+            print(f"Error retrieving minion {e}")
 
     # Define method as asynchronous
     async def system_message(self, msgContent):
