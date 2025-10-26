@@ -128,14 +128,15 @@
         box-sizing: border-box;
         font-size: 1em;
         height: 2.2em;
-        padding: 0 2.5em 0 1em;
-        width: 100%;
+        /* padding: 0 5em 0 0; */
+        padding: 0 0 0 0;
+        width: 80%;
       }
 
       .neighborhood-discovery .search-input button {
-        position: absolute;
+        /* position: absolute; */
         right: 0.8em;
-        top: 0.8em;
+        top: 1.2em;
       }
 
       .neighborhood-discovery .show-more-button {
@@ -805,6 +806,28 @@
             searchInputEl.value = '';
           });
         }
+
+        // Recenter map on user location
+        const locButton = document.getElementById('currentLocationBtn');
+        locButton.addEventListener('click', () => {
+          if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                // Recenter the map
+                widget.map.panTo({ lat, lng });
+                widget.map.setZoom(18); // optional, zoom closer to user
+              },
+              (error) => {
+                alert("Could not get location: " + error.message);
+              }
+            );
+          } else {
+            alert("Geolocation is not supported by this browser.");
+          }
+        });
+
       }
     </script>
     <script>
@@ -836,7 +859,23 @@
       };
 
       function initMap() {
-        new NeighborhoodDiscovery(CONFIGURATION);
+        if ('geolocation' in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+              CONFIGURATION.mapOptions.center = {lat, lng}; // set map center to user
+              new NeighborhoodDiscovery(CONFIGURATION);
+            },
+            (error) => {
+              // If geolocation fails, fall back to default
+              console.warn("Geolocation failed, using default center");
+              new NeighborhoodDiscovery(CONFIGURATION);
+            }
+          );
+        } else {
+          new NeighborhoodDiscovery(CONFIGURATION); // fallback if unsupported
+        }
       }
     </script>
     <script id="nd-place-results-tmpl" type="text/x-handlebars-template">
@@ -990,10 +1029,18 @@
       <div class="places-panel panel no-scroll">
         <header class="navbar">
           <div class="search-input">
+            <!-- <input type="text" width="50">
+            <input type="button">
+            <input type="button"> -->
+
             <input class="place-search-input" placeholder="Search nearby places">
             <button class="place-search-button">
               <img src="https://fonts.gstatic.com/s/i/googlematerialicons/search/v11/24px.svg" alt="search"/>
             </button>
+            <button class="button" id="currentLocationBtn">
+              <img src="https://fonts.gstatic.com/s/i/googlematerialicons/home/v11/24px.svg" alt="current location"/>
+            </button>
+
           </div>
         </header>
         <div class="results">
