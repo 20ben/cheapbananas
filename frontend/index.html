@@ -1023,59 +1023,45 @@
             <button class="close-button" id="closeDetail">×</button>
           </div>
           <img class="detail-image" src="${loc.imageUrl}">
+          <div class="detail-body">
+            <div class="detail-item">
+              <span class="detail-label">Address:</span>
+              <span class="detail-value">${loc.address}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Hours:</span>
+              <span class="detail-value">${loc.hours}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Rating:</span>
+              <span class="detail-value">${loc.rating}</span>
+            </div>
+            ${loc.deals ? `
+              <div class="detail-item">
+                <span class="detail-label">Deals:</span>
+                <span class="detail-value">${loc.deals}</span>
+              </div>
+            ` : ''}            
+          </div>
           `
-          if (loc.deals) {
-            const dealsDiv = document.createElement('div');
-            dealsDiv.className = 'detail-item';
-            dealsDiv.innerHTML = `
-              <div class="detail-body" type="overflow-y:scroll">
-                <div class="detail-item">
-                  <span class="detail-label">Address:</span>
-                  <span class="detail-value">${loc.address}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Hours:</span>
-                  <span class="detail-value">${loc.hours}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Rating:</span>
-                  <span class="detail-value">${loc.rating}</span>
-                </div>
-                <div class="detail-deals"
-                  <span class="detail-label">Deals:</span>
-                  <span class="detail-value">${loc.deals}</span>
-                </div>
-              </div>
-            `;
-            detailContent.appendChild(dealsDiv);
-          }
-          else {
-            const dealsDiv = document.createElement('div');
-            dealsDiv.className = 'detail-item';
-            dealsDiv.innerHTML = `
-              <div class="detail-body" type="overflow-y:scroll">
-                <div class="detail-item">
-                  <span class="detail-label">Address:</span>
-                  <span class="detail-value">${loc.address}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Hours:</span>
-                  <span class="detail-value">${loc.hours}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Rating:</span>
-                  <span class="detail-value">${loc.rating}</span>
-                </div>
-              </div>
-            `;
-          }
-        ;
+
+          // if (loc.deals) {
+          //   const dealsDiv = document.createElement('div');
+          //   dealsDiv.className = 'detail-item';
+          //   dealsDiv.innerHTML = `
+          //     <div class="detail-item"
+          //       <span class="detail-label">Deals:</span>
+          //       <span class="detail-value">${loc.deals}</span>
+          //     </div>
+          //   `;
+          //   detailContent.appendChild(dealsDiv);
+          // }
+          };
         
 
         document.getElementById("closeDetail").onclick = () => {
           detailPanel.classList.add("hidden");
         };
-      }
 
       // Fake coordinates generator — replace with real geocoding if needed
       function getRandomNearby() {
@@ -1117,6 +1103,13 @@
             const newLat = place.geometry.location.lat()
             const newLng = place.geometry.location.lng() 
 
+            const searchInputEl = document.getElementById("searchInput");
+            // Disable the search bar while fetching
+            searchInputEl.disabled = true;
+            searchInputEl.style.opacity = "0.5";
+            // searchInputEl.style.cursor = "not-allowed";
+            searchInputEl.placeholder = "Fetching nearby locations...";
+                        
             try {
               // Wait for the fetch to complete
               const response = await fetch('http://127.0.0.1:5000/submit_location', {
@@ -1208,6 +1201,12 @@
               
             } catch (error) {
               console.error('Error:', error);
+            } finally {
+              // Re-enable search bar after fetching
+              searchInputEl.disabled = false;
+              searchInputEl.style.opacity = "1";
+              searchInputEl.style.cursor = "text";
+              searchInputEl.placeholder = "Search for places...";
             }
         });
 
