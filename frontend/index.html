@@ -1,437 +1,562 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Neighborhood Discovery</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <script src="https://ajax.googleapis.com/ajax/libs/handlebars/4.7.7/handlebars.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Interactive map application with location search, scrollable sidebar, and detailed location information panel" />
+    <title>Map Locations - Search & Explore</title>
+
+    <!-- Google Fonts - Roboto for consistent Material Design look -->
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+
     <style>
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-
-      .neighborhood-discovery {
-        box-sizing: border-box;
-        font-family: "Roboto", sans-serif;
-        height: 100%;
-        position: relative;
-        width: 100%;
-      }
-
-      .neighborhood-discovery a {
-        color: #4285f4;
-        text-decoration: none;
-      }
-
-      .neighborhood-discovery button {
-        background: none;
-        border: none;
-        color: inherit;
-        cursor: pointer;
-        font: inherit;
-        font-size: inherit;
-        padding: 0;
-      }
-
-      .neighborhood-discovery .info {
-        color: #555;
-        font-size: 0.9em;
-        margin-top: 0.3em;
-      }
-
-      .neighborhood-discovery .panel {
-        background: white;
-        bottom: 0;
-        box-sizing: border-box;
-        left: 0;
-        overflow-y: auto;
-        position: absolute;
-        top: 0;
-        width: 20em;
-      }
-
-      .neighborhood-discovery .panel.no-scroll {
-        overflow-y: hidden;
-      }
-
-      .neighborhood-discovery .photo {
-        background-color: #dadce0;
-        background-position: center;
-        background-size: cover;
-        border-radius: 0.3em;
-        cursor: pointer;
-      }
-
-      .neighborhood-discovery .navbar {
-        background: white;
-        position: sticky;
-        top: 0;
-        z-index: 2;
-      }
-
-      .neighborhood-discovery .right {
-        float: right;
-      }
-
-      .neighborhood-discovery .star-icon {
-        filter: invert(88%) sepia(60%) saturate(2073%) hue-rotate(318deg) brightness(93%) contrast(104%);
-        height: 1.2em;
-        margin-right: -0.3em;
-        margin-top: -0.08em;
-        vertical-align: top;
-        width: 1.2em;
-      }
-
-      .neighborhood-discovery .star-icon:last-child {
-        margin-right: 0.2em;
-      }
-
-      .neighborhood-discovery .map {
-        bottom: 0;
-        left: 20em;
-        position: absolute;
-        right: 0;
-        top: 0;
-      }
-
-      @media only screen and (max-width: 640px) {
-        .neighborhood-discovery .panel {
-          right: 0;
-          top: 50%;
-          width: unset;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .neighborhood-discovery .map {
-          bottom: 50%;
-          left: 0;
+        html, body {
+            height: 100%;
+            font-family: "Roboto", -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            overflow: hidden;
         }
-      }
 
-      /* --------------------------- PLACES PANEL --------------------------- */
-
-      .neighborhood-discovery .places-panel {
-        box-shadow: 0 0 10px rgb(60 64 67 / 28%);
-        z-index: 1;
-      }
-
-      .neighborhood-discovery .places-panel header {
-        padding: 0.5em;
-      }
-
-      .neighborhood-discovery .search-input input {
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        border-radius: 0.3em;
-        box-sizing: border-box;
-        font-size: 1em;
-        height: 2.2em;
-        /* padding: 0 5em 0 0; */
-        padding: 0 0 0 0;
-        width: 80%;
-      }
-
-      .neighborhood-discovery .search-input button {
-        /* position: absolute; */
-        right: 0.8em;
-        top: 1.2em;
-      }
-
-      .neighborhood-discovery .show-more-button {
-        bottom: 0.5em;
-        display: none;
-        left: 28%;
-        line-height: 1.5em;
-        padding: 0.6em;
-        position: relative;
-        width: 44%;
-      }
-
-      .neighborhood-discovery .show-more-button.sticky {
-        background: white;
-        border-radius: 1.5em;
-        box-shadow: 0 4px 10px rgb(60 64 67 / 28%);
-        position: sticky;
-        z-index: 2;
-      }
-
-      .neighborhood-discovery .show-more-button:disabled {
-        opacity: 0.5;
-      }
-
-      .neighborhood-discovery .place-results-list {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-      }
-
-      .neighborhood-discovery .place-result {
-        border-top: 1px solid rgba(0, 0, 0, 0.12);
-        cursor: pointer;
-        display: flex;
-        padding: 0.8em;
-      }
-
-      .neighborhood-discovery .place-result .text {
-        flex-grow: 1;
-      }
-
-      .neighborhood-discovery .place-result .name {
-        font-size: 1em;
-        font-weight: 500;
-        text-align: left;
-      }
-
-      .neighborhood-discovery .place-result .photo {
-        flex: 0 0 4em;
-        height: 4em;
-        margin-left: 0.8em;
-      }
-
-      /* -------------------------- DETAILS PANEL --------------------------- */
-
-      .neighborhood-discovery .details-panel {
-        display: none;
-        z-index: 20;
-      }
-
-      .neighborhood-discovery .details-panel .back-button {
-        color: #4285f4;
-        padding: 0.9em;
-      }
-
-      .neighborhood-discovery .details-panel .back-button .icon {
-        /* Match link color #4285f4 */
-        filter: invert(47%) sepia(71%) saturate(2372%) hue-rotate(200deg) brightness(97%) contrast(98%);
-        height: 1.2em;
-        width: 1.2em;
-        vertical-align: bottom;
-      }
-
-      .neighborhood-discovery .details-panel header {
-        padding: 0.9em;
-      }
-
-      .neighborhood-discovery .details-panel h2 {
-        font-size: 1.4em;
-        font-weight: 400;
-        margin: 0;
-      }
-
-      .neighborhood-discovery .details-panel .section {
-        border-top: 1px solid rgba(0, 0, 0, 0.12);
-        padding: 0.9em;
-      }
-
-      .neighborhood-discovery .details-panel .contact {
-        align-items: center;
-        display: flex;
-        font-size: 0.9em;
-        margin: 0.8em 0;
-      }
-
-      .neighborhood-discovery .details-panel .contact .icon {
-        width: 1.5em;
-        height: 1.5em;
-      }
-
-      .neighborhood-discovery .details-panel .contact .text {
-        margin-left: 1em;
-      }
-
-      .neighborhood-discovery .details-panel .contact .weekday {
-        display: inline-block;
-        width: 5em;
-      }
-
-      .neighborhood-discovery .details-panel .photos {
-        text-align: center;
-      }
-
-      .neighborhood-discovery .details-panel .photo {
-        display: inline-block;
-        height: 5.5em;
-        width: 5.5em;
-      }
-
-      .neighborhood-discovery .details-panel .review {
-        margin-top: 1.2em;
-      }
-
-      .neighborhood-discovery .details-panel .review .reviewer-avatar {
-        background-repeat: no-repeat;
-        background-size: cover;
-        float: left;
-        height: 1.8em;
-        margin-right: 0.8em;
-        width: 1.8em;
-      }
-
-      .neighborhood-discovery .details-panel .review .reviewer-name {
-        color: #202124;
-        font-weight: 500;
-        line-height: 1.8em;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .neighborhood-discovery .details-panel .review .rating {
-        margin: 0.5em 0;
-      }
-
-      .neighborhood-discovery .details-panel .attribution {
-        color: #777;
-        margin: 0;
-        font-size: 0.8em;
-        font-style: italic;
-      }
-
-      /* --------------------------- PHOTO MODAL ---------------------------- */
-
-      .neighborhood-discovery .photo-modal {
-        background: rgba(0, 0, 0, 0.8);
-        display: none;
-        height: 100%;
-        position: fixed;
-        width: 100%;
-        z-index: 100;
-      }
-
-      .neighborhood-discovery .photo-modal > img {
-        bottom: 0;
-        left: 0;
-        margin: auto;
-        max-height: 100%;
-        max-width: 100%;
-        position: absolute;
-        right: 0;
-        top: 0;
-      }
-
-      .neighborhood-discovery .photo-modal > div {
-        border-radius: 0.4em;
-        color: white;
-        background: rgba(0, 0, 0, 0.6);
-        margin: 1em;
-        padding: 0.9em;
-        position: absolute;
-      }
-
-      .neighborhood-discovery .photo-modal .back-button .icon {
-        filter: brightness(0) invert(1);
-        margin: 0.4em 0.6em 0 0;
-      }
-
-      .neighborhood-discovery .photo-modal .photo-text {
-        float: right;
-      }
-
-      .neighborhood-discovery .photo-modal .photo-attrs {
-        font-size: 0.8em;
-        margin-top: 0.3em;
-      }
-    </style>
-    <script>
-      'use strict';
-
-      /** Hides a DOM element and optionally focuses on focusEl. */
-      function hideElement(el, focusEl) {
-        el.style.display = 'none';
-        if (focusEl) focusEl.focus();
-      }
-
-      /** Shows a DOM element that has been hidden and optionally focuses on focusEl. */
-      function showElement(el, focusEl) {
-        el.style.display = 'block';
-        if (focusEl) focusEl.focus();
-      }
-
-      /** Determines if a DOM element contains content that cannot be scrolled into view. */
-      function hasHiddenContent(el) {
-        const noscroll = window.getComputedStyle(el).overflowY.includes('hidden');
-        return noscroll && el.scrollHeight > el.clientHeight;
-      }
-
-      /** Format a Place Type string by capitalizing and replacing underscores with spaces. */
-      function formatPlaceType(str) {
-        const capitalized = str.charAt(0).toUpperCase() + str.slice(1);
-        return capitalized.replace(/_/g, ' ');
-      }
-
-      /** Initializes an array of zeros with the given size. */
-      function initArray(arraySize) {
-        const array = [];
-        while (array.length < arraySize) {
-          array.push(0);
+        .app-container {
+            display: flex;
+            height: 100vh;
+            background: #f3f4f6;
         }
-        return array;
-      }
 
-      /** Assigns star icons to an object given its rating (out of 5). */
-      function addStarIcons(obj) {
-        if (!obj.rating) return;
-        const starsOutOfTen = Math.round(2 * obj.rating);
-        const fullStars = Math.floor(starsOutOfTen / 2);
-        const halfStars = fullStars !== starsOutOfTen / 2 ? 1 : 0;
-        const emptyStars = 5 - fullStars - halfStars;
+        /* Sidebar Styles - Enhanced with Google Maps aesthetic */
+        .sidebar {
+            width: 384px;
+            background: white;
+            box-shadow: 0 0 10px rgb(60 64 67 / 28%);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
 
-        // Express stars as arrays to make iterating in Handlebars easy.
-        obj.fullStarIcons = initArray(fullStars);
-        obj.halfStarIcons = initArray(halfStars);
-        obj.emptyStarIcons = initArray(emptyStars);
-      }
+        .search-header {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
 
-      /**
-       * Constructs an array of opening hours by day from a PlaceOpeningHours object,
-       * where adjacent days of week with the same hours are collapsed into one element.
-       */
-      function parseDaysHours(openingHours) {
-        const daysHours = openingHours.weekday_text.map((e) => e.split(/\:\s+/))
-                  .map((e) => ({'days': e[0].substr(0, 3), 'hours': e[1]}));
+        .search-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: #f9fafb;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
 
-        for (let i = 1; i < daysHours.length; i++) {
-          if (daysHours[i - 1].hours === daysHours[i].hours) {
-            if (daysHours[i - 1].days.indexOf('-') !== -1) {
-              daysHours[i - 1].days =
-                  daysHours[i - 1].days.replace(/\w+$/, daysHours[i].days);
-            } else {
-              daysHours[i - 1].days += ' - ' + daysHours[i].days;
+        .search-input-wrapper:focus-within {
+            background: white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-icon {
+            width: 20px;
+            height: 20px;
+            color: #5f6368;
+        }
+
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 0.875rem;
+            color: #202124;
+        }
+
+        .search-input::placeholder {
+            color: #5f6368;
+        }
+
+        /* Location List - Google Maps style */
+        .location-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .location-card {
+            width: 100%;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
+            text-align: left;
+            border: none;
+            background: white;
+            border-left: 4px solid transparent;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+        }
+
+        .location-card:hover {
+            background: #f8f9fa;
+        }
+
+        .location-card:active {
+            background: #f1f3f4;
+        }
+
+        .location-card.selected {
+            background: #e8f0fe;
+            border-left-color: #1a73e8;
+        }
+
+        .location-card-content {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .location-image {
+            width: 64px;
+            height: 64px;
+            border-radius: 0.5rem;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .location-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .location-name {
+            font-weight: 500;
+            font-size: 1em;
+            color: #202124;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 0.25rem;
+            line-height: 1.4;
+        }
+
+        .location-badge {
+            display: inline-block;
+            padding: 0.125rem 0.5rem;
+            background: #f1f3f4;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            color: #5f6368;
+            margin-top: 0.25rem;
+            font-weight: 400;
+        }
+
+        .location-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #5f6368;
+        }
+
+        .star-icon {
+            width: 16px;
+            height: 16px;
+            fill: #fbbf24;
+            color: #fbbf24;
+        }
+
+        /* Detail Panel - Google Maps aesthetic */
+        .detail-panel {
+            width: 384px;
+            background: white;
+            box-shadow: 0 0 10px rgb(60 64 67 / 28%);
+            border-radius: 1rem 0 0 1rem;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100vh;
+            z-index: 20;
+        }
+
+        .detail-panel.hidden {
+            transform: translateX(100%);
+        }
+
+        .detail-panel-content {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            background: white;
+        }
+
+        .detail-title-section {
+            flex: 1;
+        }
+
+        .detail-title {
+            font-size: 1.4em;
+            font-weight: 400;
+            color: #202124;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .detail-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border: 1px solid #dadce0;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            color: #5f6368;
+            font-weight: 400;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #5f6368;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            line-height: 1;
+            border-radius: 0.25rem;
+            transition: all 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .close-button:hover {
+            background: #f1f3f4;
+            color: #202124;
+        }
+
+        .close-button:active {
+            background: #e8eaed;
+        }
+
+        .detail-image {
+            width: 100%;
+            height: 192px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .detail-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: start;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem 0;
+        }
+
+        .detail-icon {
+            width: 20px;
+            height: 20px;
+            color: #5f6368;
+            margin-top: 0.125rem;
+            flex-shrink: 0;
+        }
+
+        .detail-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 0.125rem;
+        }
+
+        .detail-value {
+            font-size: 0.875rem;
+            color: #5f6368;
+            line-height: 1.5;
+        }
+
+        .detail-rating-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .detail-rating-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .detail-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.12);
+            background: white;
+        }
+
+        .action-button {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
+            margin-bottom: 0.5rem;
+            font-family: "Roboto", sans-serif;
+        }
+
+        .action-button.primary {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15);
+        }
+
+        .action-button.primary:hover {
+            background: #1765cc;
+            box-shadow: 0 1px 3px 0 rgba(60, 64, 67, .3), 0 4px 8px 3px rgba(60, 64, 67, .15);
+        }
+
+        .action-button.primary:active {
+            background: #1557b0;
+            box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15);
+        }
+
+        .action-button.secondary {
+            background: white;
+            color: #1a73e8;
+            border: 1px solid #dadce0;
+        }
+
+        .action-button.secondary:hover {
+            background: #f8f9fa;
+            border-color: #dadce0;
+        }
+
+        .action-button.secondary:active {
+            background: #f1f3f4;
+        }
+
+        /* Map Styles */
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .current-location-button {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            padding: 0.75rem;
+            box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 2px 6px 2px rgba(60, 64, 67, .15);
+            cursor: pointer;
+            transition: all 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
+            z-index: 999;
+        }
+
+        .current-location-button:hover {
+            background: #f8f9fa;
+            box-shadow: 0 1px 3px 0 rgba(60, 64, 67, .3), 0 4px 8px 3px rgba(60, 64, 67, .15);
+        }
+
+        .current-location-button:active {
+            background: #f1f3f4;
+            box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15);
+        }
+
+        .current-location-icon {
+            width: 24px;
+            height: 24px;
+            display: block;
+            color: #5f6368;
+        }
+
+        /* Responsive adjustments */
+        @media only screen and (max-width: 640px) {
+            .sidebar {
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                height: 50%;
+                width: 100%;
             }
-            daysHours.splice(i--, 1);
-          }
+
+            .detail-panel {
+                width: 100%;
+            }
+
+            .map-container {
+                height: 50% !important;
+            }
         }
-        return daysHours;
-      }
 
-      /** Number of POIs to show on widget load. */
-      const ND_NUM_PLACES_INITIAL = 5;
+        /* Smooth scrolling for all scrollable areas */
+        .location-list, .detail-body {
+            scrollbar-width: thin;
+            scrollbar-color: #dadce0 transparent;
+        }
 
-      /** Number of additional POIs to show when 'Show More' button is clicked. */
-      const ND_NUM_PLACES_SHOW_MORE = 5;
+        .location-list::-webkit-scrollbar, .detail-body::-webkit-scrollbar {
+            width: 8px;
+        }
 
-      /** Maximum number of place photos to show on the details panel. */
-      const ND_NUM_PLACE_PHOTOS_MAX = 6;
+        .location-list::-webkit-scrollbar-track, .detail-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
 
-      /** Minimum zoom level at which the default map POI pins will be shown. */
-      const ND_DEFAULT_POI_MIN_ZOOM = 18;
+        .location-list::-webkit-scrollbar-thumb, .detail-body::-webkit-scrollbar-thumb {
+            background-color: #dadce0;
+            border-radius: 4px;
+        }
 
-      /** Mapping of Place Types to Material Icons used to render custom map markers. */
-      const ND_MARKER_ICONS_BY_TYPE = {
-        // Full list of icons can be found at https://fonts.google.com/icons
-        '_default': 'circle',
-        'park': 'park',
-        'museum': 'museum',
-        'shopping_mall': 'local_mall',
-      };
+        .location-list::-webkit-scrollbar-thumb:hover, .detail-body::-webkit-scrollbar-thumb:hover {
+            background-color: #bdc1c6;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Search Header -->
+            <div class="search-header">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search for places..." />
+                </div>
+            </div>
 
-      /**
-       * Defines an instance of the Neighborhood Discovery widget, to be
-       * instantiated when the Maps library is loaded.
-       */
+            <!-- Location List -->
+            <div class="location-list" id="locationList"></div>
+        </div>
+
+        <!-- Detail Panel -->
+        <div class="detail-panel hidden" id="detailPanel">
+            <div class="detail-panel-content" id="detailPanelContent"></div>
+        </div>
+
+        <!-- Map Container -->
+        <div class="map-container">
+            <div id="map"></div>
+            <button class="current-location-button" id="currentLocationBtn" title="Current Location">
+                <svg class="current-location-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================================
+        // DATA
+        // ============================================================================
+        const locationData = [
+            {
+                id: "1",
+                name: "Blue Bottle Coffee",
+                category: "Cafe",
+                address: "66 Mint St, San Francisco, CA 94103",
+                rating: 4.5,
+                hours: "Open · Closes 6:00 PM",
+                imageUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=100&h=100&fit=crop"
+            },
+            {
+                id: "2",
+                name: "Golden Gate Park",
+                category: "Park",
+                address: "Golden Gate Park, San Francisco, CA 94122",
+                rating: 4.8,
+                hours: "Open 24 hours",
+                imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop"
+            },
+            {
+                id: "3",
+                name: "Ferry Building Marketplace",
+                category: "Shopping",
+                address: "1 Ferry Building, San Francisco, CA 94111",
+                rating: 4.6,
+                hours: "Open · Closes 7:00 PM",
+                imageUrl: "https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?w=100&h=100&fit=crop"
+            },
+            {
+                id: "4",
+                name: "Tartine Bakery",
+                category: "Bakery",
+                address: "600 Guerrero St, San Francisco, CA 94110",
+                rating: 4.7,
+                hours: "Open · Closes 5:00 PM",
+                imageUrl: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=100&h=100&fit=crop"
+            },
+            {
+                id: "5",
+                name: "Exploratorium",
+                category: "Museum",
+                address: "Pier 15, San Francisco, CA 94111",
+                rating: 4.6,
+                hours: "Open · Closes 5:00 PM",
+                imageUrl: "https://images.unsplash.com/photo-1560264280-88b68371db39?w=100&h=100&fit=crop"
+            },
+            {
+                id: "6",
+                name: "Fisherman's Wharf",
+                category: "Tourist Attraction",
+                address: "Jefferson St, San Francisco, CA 94133",
+                rating: 4.4,
+                hours: "Open 24 hours",
+                imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=100&h=100&fit=crop"
+            },
+            {
+                id: "7",
+                name: "Zazie Restaurant",
+                category: "Restaurant",
+                address: "941 Cole St, San Francisco, CA 94117",
+                rating: 4.5,
+                hours: "Open · Closes 9:00 PM",
+                imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=100&h=100&fit=crop"
+            },
+            {
+                id: "8",
+                name: "Alamo Square Park",
+                category: "Park",
+                address: "Hayes St & Steiner St, San Francisco, CA 94117",
+                rating: 4.7,
+                hours: "Open 24 hours",
+                imageUrl: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=100&h=100&fit=crop"
+            }
+        ];
+
+        // ============================================================================
+        // GLOBAL STATE
+        // ============================================================================
       function NeighborhoodDiscovery(configuration) {
         const widget = this;
         const widgetEl = document.querySelector('.neighborhood-discovery');
@@ -797,9 +922,12 @@
           });
         }
 
+
+        let myLocations = []; // global
+
         /** Initializes Search Input for the widget. */
         function initializeSearchInput() {
-          const searchInputEl = widgetEl.querySelector('.place-search-input');
+          const searchInputEl = document.getElementById('searchInput');
           widget.placeIdsToAutocompleteResults = new Map();
 
           // Set up Autocomplete on the search input.
@@ -915,282 +1043,173 @@
       }
     </script>
     <script>
-      const CONFIGURATION = {
-        "capabilities": {"search":true,"distances":false,"directions":false,"contacts":true,"atmospheres":true,"thumbnails":true},
-        "pois": [
-          {"placeId": "ChIJQdQyeiZu5kcRUfQHfB-OCLA"},
-          {"placeId": "ChIJ442GNENu5kcRGYUrvgqHw88"},
-          {"placeId": "ChIJAQAAMCxu5kcRx--_4QnbGcI"},
-          {"placeId": "ChIJ0dzuSNBv5kcRa6BHUVdFm0k"},
-          {"placeId": "ChIJPUBtQTVu5kcRnPMYVq9Mthg"},
-          {"placeId": "ChIJVUrgmz5u5kcRWPSN-T8a730"},
-          {"placeId": "ChIJwxT3mL5v5kcRAsTd3v0lJOY"},
-          {"placeId": "ChIJ6SJcCP5x5kcRJt8m9_lR7_Q"}
-        ],
-        "centerMarker": {"icon":"circle"},
-        "mapRadius": 20000,
-        "mapOptions": {
-          "center":{"lat":37.8715,"lng":-122.2730},
-          "fullscreenControl":true,
-          "mapTypeControl":true,
-          "streetViewControl":false,
-          "zoom":15,
-          "zoomControl":true,
-          "maxZoom":22,
-          "minZoom":12,
-          "mapId":""},
-        "mapsApiKey": "AIzaSyAn4h2aJ5gzIUxOdaxun2I01Y_rpl4Vd3Q",
-      };
+      let map;
+      let markers = [];
 
-      let myLocations = [];
+      // Render sidebar locations
+      function renderLocationList(locations) {
+        const list = document.getElementById("locationList");
+        list.innerHTML = "";
 
-      function initMap() {
-        if ('geolocation' in navigator) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const lat = position.coords.latitude;
-              const lng = position.coords.longitude;
-              CONFIGURATION.mapOptions.center = {lat, lng}; // set map center to user
+        locations.forEach((loc, i) => {
+          const card = document.createElement("button");
+          card.className = "location-card";
+          card.innerHTML = `
+            <div class="location-card-content">
+              <img class="location-image" src="${loc.imageUrl}" alt="${loc.name}">
+              <div class="location-info">
+                <div class="location-name">${loc.name}</div>
+                <div class="location-badge">${loc.category}</div>
+                <div class="location-rating">
+                  ⭐ ${loc.rating} • ${loc.hours}
+                </div>
+              </div>
+            </div>
+          `;
+          card.addEventListener("click", () => selectLocation(loc, i));
+          list.appendChild(card);
 
-              
+          // Create marker
+          const marker = new google.maps.Marker({
+            position: getRandomNearby(),
+            map: map,
+            title: loc.name,
+          });
+          marker.addListener("click", () => selectLocation(loc, i));
+          markers.push(marker);
+        });
+      }
 
-              new NeighborhoodDiscovery(CONFIGURATION);
-            },
-            (error) => {
-              // If geolocation fails, fall back to default
-              console.warn("Geolocation failed, using default center");
-              new NeighborhoodDiscovery(CONFIGURATION);
-            }
-          );
-        } else {
-          new NeighborhoodDiscovery(CONFIGURATION); // fallback if unsupported
-        }
+      // Select location
+      function selectLocation(loc, index) {
+        const detailPanel = document.getElementById("detailPanel");
+        const detailContent = document.getElementById("detailPanelContent");
 
-        // // Handle Fetch Button Click
-        // const fetchDataBtn = document.getElementById('fetchBtn');
-        // fetchDataBtn.addEventListener('click', async () => {
-        //   try {
-        //     const res = await axios.get("http://127.0.0.1:5000/api/data");
-        //     const data = res.data;  // ← this is your list of lat/lng points
+        detailPanel.classList.remove("hidden");
+        detailContent.innerHTML = `
+          <div class="detail-header">
+            <div class="detail-title-section">
+              <div class="detail-title">${loc.name}</div>
+              <div class="detail-badge">${loc.category}</div>
+            </div>
+            <button class="close-button" id="closeDetail">×</button>
+          </div>
+          <img class="detail-image" src="${loc.imageUrl}">
+          <div class="detail-body">
+            <div class="detail-item">
+              <span class="detail-label">Address:</span>
+              <span class="detail-value">${loc.address}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Hours:</span>
+              <span class="detail-value">${loc.hours}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Rating:</span>
+              <span class="detail-value">${loc.rating}</span>
+            </div>
+          </div>
+        `;
 
-        //     console.log("Fetched data:", data);
+        document.getElementById("closeDetail").onclick = () => {
+          detailPanel.classList.add("hidden");
+        };
+      }
 
-        //     // Loop through each item and place a red marker
-        //     data.forEach(point => {
-        //       new google.maps.Marker({
-        //         position: { lat: point.lat, lng: point.lng },
-        //         map: map,
-        //         title: point.name,
-        //         icon: {
-        //           url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
-        //         }
-        //       });
-        //     });
-
-        //   } catch (err) {
-        //     console.error("Error fetching data:", err);
-        //   }
-        // });
-
+      // Fake coordinates generator — replace with real geocoding if needed
+      function getRandomNearby() {
+        const base = { lat: 37.7749, lng: -122.4194 };
+        return {
+          lat: base.lat + (Math.random() - 0.5) * 0.05,
+          lng: base.lng + (Math.random() - 0.5) * 0.05,
+        };
       }
     </script>
-    <script id="nd-place-results-tmpl" type="text/x-handlebars-template">
-      {{#each places}}
-        <li class="place-result">
-          <div class="text">
-            <button class="name">{{name}}</button>
-            <div class="info">
-              {{#if rating}}
-                <span>{{rating}}</span>
-                <img src="https://fonts.gstatic.com/s/i/googlematerialicons/star/v15/24px.svg" alt="rating" class="star-icon"/>
-              {{/if}}
-              {{#if numReviews}}
-                <span>&nbsp;({{numReviews}})</span>
-              {{/if}}
-              {{#if priceLevel}}
-                &#183;&nbsp;<span>{{#each dollarSigns}}${{/each}}&nbsp;</span>
-              {{/if}}
-            </div>
-            <div class="info">{{type}}</div>
-          </div>
-          <button class="photo" style="background-image:url({{photos.0.urlSmall}})" aria-label="show photo in viewer"></button>
-        </li>
-      {{/each}}
-    </script>
-    <script id="nd-place-details-tmpl" type="text/x-handlebars-template">
-      <div class="navbar">
-        <button class="back-button">
-          <img class="icon" src="https://fonts.gstatic.com/s/i/googlematerialicons/arrow_back/v11/24px.svg" alt="back"/>
-          Back
-        </button>
-      </div>
-      <header>
-        <h2>{{name}}</h2>
-        <div class="info">
-          {{#if rating}}
-            <span class="star-rating-numeric">{{rating}}</span>
-            <span>
-              {{#each fullStarIcons}}
-                <img src="https://fonts.gstatic.com/s/i/googlematerialicons/star/v15/24px.svg" alt="full star" class="star-icon"/>
-              {{/each}}
-              {{#each halfStarIcons}}
-                <img src="https://fonts.gstatic.com/s/i/googlematerialicons/star_half/v17/24px.svg" alt="half star" class="star-icon"/>
-              {{/each}}
-              {{#each emptyStarIcons}}
-                <img src="https://fonts.gstatic.com/s/i/googlematerialicons/star_outline/v9/24px.svg" alt="empty star" class="star-icon"/>
-              {{/each}}
-            </span>
-          {{/if}}
-          {{#if numReviews}}
-            <a href="{{url}}" target="_blank">{{numReviews}} reviews</a>
-          {{else}}
-            <a href="{{url}}" target="_blank">See on Google Maps</a>
-          {{/if}}
-          {{#if priceLevel}}
-            &#183;
-            <span class="price-dollars">
-              {{#each dollarSigns}}${{/each}}
-            </span>
-          {{/if}}
-        </div>
-        {{#if type}}
-          <div class="info">{{type}}</div>
-        {{/if}}
-      </header>
-      <div class="section">
-        {{#if address}}
-          <div class="contact">
-            <img src="https://fonts.gstatic.com/s/i/googlematerialicons/place/v10/24px.svg" alt="Address" class="icon"/>
-            <div class="text">
-              {{address}}
-            </div>
-          </div>
-        {{/if}}
-        {{#if website}}
-          <div class="contact">
-            <img src="https://fonts.gstatic.com/s/i/googlematerialicons/public/v10/24px.svg" alt="Website" class="icon"/>
-            <div class="text">
-              <a href="{{website}}" target="_blank">{{websiteDomain}}</a>
-            </div>
-          </div>
-        {{/if}}
-        {{#if phoneNumber}}
-          <div class="contact">
-            <img src="https://fonts.gstatic.com/s/i/googlematerialicons/phone/v10/24px.svg" alt="Phone number" class="icon"/>
-            <div class="text">
-              {{phoneNumber}}
-            </div>
-          </div>
-        {{/if}}
-        {{#if openingHours}}
-          <div class="contact">
-            <img src="https://fonts.gstatic.com/s/i/googlematerialicons/schedule/v12/24px.svg" alt="Opening hours" class="icon"/>
-            <div class="text">
-              {{#each openingHours}}
-                <div>
-                  <span class="weekday">{{days}}</span>
-                  <span class="hours">{{hours}}</span>
-                </div>
-              {{/each}}
-            </div>
-          </div>
-        {{/if}}
-      </div>
-      {{#if photos}}
-        <div class="photos section">
-          {{#each photos}}
-            <button class="photo" style="background-image:url({{urlSmall}})" aria-label="show photo in viewer"></button>
-          {{/each}}
-        </div>
-      {{/if}}
-      {{#if reviews}}
-        <div class="reviews section">
-          <p class="attribution">Reviews by Google users</p>
-          {{#each reviews}}
-            <div class="review">
-              <a class="reviewer-identity" href="{{author_url}}" target="_blank">
-                <div class="reviewer-avatar" style="background-image:url({{profile_photo_url}})"></div>
-                <div class="reviewer-name">{{author_name}}</div>
-              </a>
-              <div class="rating info">
-                <span>
-                  {{#each fullStarIcons}}
-                    <img src="https://fonts.gstatic.com/s/i/googlematerialicons/star/v15/24px.svg" alt="full star" class="star-icon"/>
-                  {{/each}}
-                  {{#each halfStarIcons}}
-                    <img src="https://fonts.gstatic.com/s/i/googlematerialicons/star_half/v17/24px.svg" alt="half star" class="star-icon"/>
-                  {{/each}}
-                  {{#each emptyStarIcons}}
-                    <img src="https://fonts.gstatic.com/s/i/googlematerialicons/star_outline/v9/24px.svg" alt="empty star" class="star-icon"/>
-                  {{/each}}
-                </span>
-                <span class="review-time">{{relative_time_description}}</span>
-              </div>
-              <div class="info">{{text}}</div>
-            </div>
-          {{/each}}
-        </div>
-      {{/if}}
-      {{#if html_attributions}}
-        <div class="section">
-          {{#each html_attributions}}
-            <p class="attribution">{{{this}}}</p>
-          {{/each}}
-        </div>
-      {{/if}}
-    </script>
-  </head>
-  <body>
-    <div class="neighborhood-discovery">
-      <div class="places-panel panel no-scroll">
-        <header class="navbar">
-          <div class="search-input">
-            <!-- <input type="text" width="50">
-            <input type="button">
-            <input type="button"> -->
 
-            <input class="place-search-input" placeholder="Search nearby places">
-            <button class="place-search-button" id="fetchBtn">
-              <img src="https://fonts.gstatic.com/s/i/googlematerialicons/search/v11/24px.svg" alt="search"/>
-            </button>
-            <button class="button" id="currentLocationBtn">
-              <img src="https://fonts.gstatic.com/s/i/googlematerialicons/home/v11/24px.svg" alt="current location"/>
-            </button>
+    <!-- Load Google Maps API -->
 
-          </div>
-        </header>
-        <div class="results">
-          <ul class="place-results-list"></ul>
-        </div>
-        <button class="show-more-button sticky">
-          <span>Show More</span>
-          <img class="right" src="https://fonts.gstatic.com/s/i/googlematerialicons/expand_more/v11/24px.svg" alt="expand"/>
-        </button>
-      </div>
-      <div class="details-panel panel"></div>
-      <div class="map"></div>
-      <div class="photo-modal">
-        <img alt="place photo"/>
-        <div>
-          <button class="back-button">
-            <img class="icon" src="https://fonts.gstatic.com/s/i/googlematerialicons/arrow_back/v11/24px.svg" alt="back"/>
-          </button>
-          <div class="photo-text">
-            <div class="photo-place"></div>
-            <div class="photo-attrs">Photo by <span></span></div>
-          </div>
-        </div>
-      </div>
-      <svg class="marker-pin" xmlns="http://www.w3.org/2000/svg" width="26" height="38" fill="none">
-        <path d="M13 0C5.817 0 0 5.93 0 13.267c0 7.862 5.59 10.81 9.555 17.624C12.09 35.248 11.342 38 13 38c1.723 0 .975-2.817 3.445-7.043C20.085 24.503 26 21.162 26 13.267 26 5.93 20.183 0 13 0Z"/>
-      </svg>
-    </div>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAn4h2aJ5gzIUxOdaxun2I01Y_rpl4Vd3Q&callback=initMap&libraries=places,geometry&solution_channel=GMP_QB_neighborhooddiscovery_v3_cADEF" async defer></script>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAn4h2aJ5gzIUxOdaxun2I01Y_rpl4Vd3Q&callback=initMap&libraries=places"
+      async
+      defer
+    ></script>
+    
+    
+    <script>
+    function initMap() {
+        const center = { lat: 37.7749, lng: -122.4194 }; // default SF
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 12,
+            center: center
+        });
+
+        // Try to get user's location
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    map.setCenter(userLocation);
+                    map.setZoom(15);
+
+                    new google.maps.Marker({
+                        position: userLocation,
+                        map: map,
+                        title: "You are here",
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            scale: 8,
+                            fillColor: "#4285F4",
+                            fillOpacity: 1,
+                            strokeWeight: 2,
+                            strokeColor: "white",
+                        }
+                    });
+                },
+                (err) => {
+                    console.warn("User denied location or it could not be determined.", err);
+                }
+            );
+        } else {
+            console.warn("Geolocation not supported by this browser.");
+        }
+
+        // Render sample data points
+        locationData.forEach((loc) => {
+          const marker = new google.maps.Marker({
+            position: getRandomNearby(),
+            map: map,
+            title: loc.name,
+          });
+          marker.addListener("click", () => selectLocation(loc));
+        });
+
+
+        // Current location button
+        document.getElementById("currentLocationBtn").addEventListener("click", () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        map.setCenter(userLocation);
+                        map.setZoom(15);
+                    },
+                    (err) => alert("Could not get location: " + err.message)
+                );
+            }
+        });
+
+        renderLocationList(locationData);
+
+    }
+    </script>
     
 
-  </body>
 
-
-
-
+</body>
 </html>
