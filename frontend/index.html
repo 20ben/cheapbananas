@@ -260,6 +260,13 @@
             padding: 1.5rem;
         }
 
+        .detail-body hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 8px 0;
+            opacity: 0.5;
+        }
+
         .detail-item {
             display: flex;
             align-items: start;
@@ -1036,13 +1043,38 @@
               <span class="detail-label">Rating:</span>
               <span class="detail-value">${loc.rating}</span>
             </div>
-            ${loc.deals ? `
-              <div class="detail-item">
-                <span class="detail-label">Deals:</span>
-                <span class="detail-value">${loc.deals}</span>
-              </div>
-            ` : ''}            
-          </div>
+            ${
+              loc.deals
+                ? loc.deals
+                    .map(
+                      (deal, i) => `
+                        <hr>
+                        <div class="detail-item">
+                          <span class="detail-label">Deal Type:</span>
+                          <span class="detail-value">${deal.deal_type}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Description:</span>
+                          <span class="detail-value">${deal.description}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Discount:</span>
+                          <span class="detail-value">${deal.price_discount}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Availability:</span>
+                          <span class="detail-value">${deal.availability}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Source:</span>
+                          <span class="detail-value"><a href="${deal.source}" target="_blank">View Offer</a></span>
+                        </div>
+                      `
+                    )
+                    .join("")
+                : ""
+            }
+            </div>
           `
 
           // if (loc.deals) {
