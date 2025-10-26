@@ -52,10 +52,10 @@ class AsyncLettaMinion:
                 messages=[
             {
                 "role": "system",
-                "content": f"Save a list of deals entries for {place_name} to a memory block or update it if it already exists. Deals specific to {place_name} in {place_location} should be prioritized, but all relevant and currently active deals should be returned. For each deal entry, specify the deal type, a description, the price/discount, the availability, and the source links.",
+                "content": f"Save a list of deals entries for {place_name} to a memory block or update it if it already exists. Deals specific to {place_name} in {place_location} should be prioritized, but all relevant and currently active deals should be returned. For each deal entry, specify the deal type, a description, the price/discount, the availability, and the source links. If there is no relevant info for this {place_name} {place_location} then do not write to memory.",
             }])
             print("save complete")
         except Exception as e:
-            print(e)
+            print("error 524 timeout")
 
 

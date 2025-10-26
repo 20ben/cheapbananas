@@ -36,7 +36,7 @@ def run_minion_thread(minion_id, data):
     # Each thread runs its own asyncio event loop
     asyncio.run(run_minion_async(minion_id, data))
 
-MINION_IDS = [os.environ[f"MINION_ID{i}"] for i in range(1, 11)]
+MINION_IDS = [os.environ[f"MINION_ID{i}"] for i in range(1, 9)]
 
 FAKE_DATA = [
     ["TP Tea", "Berkeley"],
@@ -46,9 +46,7 @@ FAKE_DATA = [
     ["Gong Cha", "Berkeley"],
     ["Happy Lemon", "Berkeley"],
     ["Tea Era", "Berkeley"],
-    ["Tiger Sugar", "Berkeley"],
-    ["Cha For Tea", "Berkeley"],
-    ["CoCo Fresh Tea & Juice", "Berkeley"]
+    ["Tiger Sugar", "Berkeley"]
 ]
 
 # Async function for one minion
@@ -72,4 +70,4 @@ for minion_id, data in zip(MINION_IDS, FAKE_DATA):
 for t in threads:
     t.join()
 
-print("All 10 minions connected and data saved!")
+print("All 8 minions connected and data saved!")
