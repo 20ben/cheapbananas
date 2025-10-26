@@ -813,77 +813,55 @@
             bounds: widget.mapBounds,
             strictBounds: true,
           });
-          autocomplete.addListener('place_changed', () => {
+          autocomplete.addListener('place_changed', async () => {
             
             const place = autocomplete.getPlace();
             const newLat = place.geometry.location.lat()
             const newLng = place.geometry.location.lng() 
 
-            // hardcoding for now
-            fetch('http://127.0.0.1:5000/submit_location', {
-                // sending lat and long to server.py 
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ lat: newLat, lng: newLng })
-                })
-                .then(response => response.json())
-                .then(result => {
-                  // do stuff
-                  myLocations = result;
-
-                })
-                .catch(error => console.error('Error:', error));
-              
-            // Need to Recenter person so that they are at the place that the user entered.
-            // TODO
-            
-            widget.map.panTo({lat: newLat, lng: newLng});
-            //widget.map.setZoom(18); // optional, zoom closer to user
-            
-            
-            widget.placeIdsToAutocompleteResults.set(place.place_id, place);
-            widget.selectPlaceById(place.place_id, /* panToMarker= */ true);
-            searchInputEl.value = '';
-
-            // Optional: fit map to show search result + red markers
-            const bounds = new google.maps.LatLngBounds();
-
-            // Add the place from search
-            //if (place.geometry && place.geometry.location) {
-            //  bounds.extend(place.geometry.location);
-            //}
-
-            console.log("we go here first")
-            console.log(myLocations)
-
-            // Add each red marker location
-            myLocations.forEach(loc => {
-              const latLng = new google.maps.LatLng(loc.lat, loc.lng);
-              bounds.extend(latLng);
-
-              console.log("we go here")
-
-              new google.maps.Marker({
-                position: latLng,
-                map: widget.map,
-                title: `Location: ${loc.lat}, ${loc.lng}`,
-                icon: {
-                  path: google.maps.SymbolPath.CIRCLE,
-                  scale: 8,
-                  fillColor: 'red',
-                  fillOpacity: 1,
-                  strokeWeight: 1,
-                  strokeColor: 'darkred'
-                }
+            try {
+              // Wait for the fetch to complete
+              const response = await fetch('http://127.0.0.1:5000/submit_location', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lat: newLat, lng: newLng })
               });
-            });
+              
+              const result = await response.json();
+              myLocations = result;
 
+              // Now myLocations is populated, continue with the rest
+              widget.map.panTo({lat: newLat, lng: newLng});
+              widget.placeIdsToAutocompleteResults.set(place.place_id, place);
+              widget.selectPlaceById(place.place_id, true);
+              searchInputEl.value = '';
 
-            // Fit map to include all markers
-            widget.map.fitBounds(bounds);
+              const bounds = new google.maps.LatLngBounds();
+              
+              myLocations.forEach(loc => {
+                const latLng = new google.maps.LatLng(loc.lat, loc.lng);
+                bounds.extend(latLng);
 
+                new google.maps.Marker({
+                  position: latLng,
+                  map: widget.map,
+                  title: `Location: ${loc.lat}, ${loc.lng}`,
+                  icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 8,
+                    fillColor: 'red',
+                    fillOpacity: 1,
+                    strokeWeight: 1,
+                    strokeColor: 'darkred'
+                  }
+                });
+              });
 
-
+              widget.map.fitBounds(bounds);
+              
+            } catch (error) {
+              console.error('Error:', error);
+            }
           });
 
         }
