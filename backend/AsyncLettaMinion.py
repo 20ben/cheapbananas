@@ -56,38 +56,6 @@ class AsyncLettaMinion:
             }])
             print("save complete")
         except Exception as e:
-            print(e)    
+            print(e)
 
-    
-    # # Define method as asynchronous
-    # async def query_deals(self, place_name, place_location):
-        
-    #     # Use await for the asynchronous client call
-    #     response = await self.client.agents.messages.create(
-    #         agent_id=self.agent_state.id,
-    #         messages=[
-    #     {
-    #         "role": "system",
-    #         "content": f"Return a list of deals for {place_name}. Deals specific to {place_name} in {place_location} should be prioritized, but all relevant and currently active deals should be returned. For each deal entry, specify the deal type, a description, the price/discount, the availability, and the source links. At the end, pass the arguments to the generate_deal_entries_json tool.",
-    #     }])
 
-    #     result = {}
-    #     last_call = None
-
-    #     for message in response.messages:
-    #         if message.message_type == "tool_call_message":
-    #             # Ensure we handle the possibility of multiple tool calls and take the last one
-    #             last_call = message.tool_call.arguments
-                
-    #     if last_call:
-    #         print(last_call)
-    #         # This is still synchronous and safe to use
-    #         args = json.loads(last_call)
-            
-    #         result['name'] = args['name']
-    #         result['deals'] = args['deals']
-            
-    #         return result
-        
-    #     # Return an empty dict if no tool call message was found
-    #     return {}

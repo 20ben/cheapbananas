@@ -4,6 +4,8 @@ from letta_client import Letta
 from AsyncLettaMinion import AsyncLettaMinion
 from AsyncLettaReader import AsyncLettaReader
 import asyncio
+import threading
+import time
 
 # load Letta API key and agent ID from from .env and check validity
 load_dotenv()
@@ -20,20 +22,54 @@ if MINION_ID2 is None:
     raise ValueError("MINION_ID2 environment variable not set")
 
 
-READER_ID = os.environ.get('READER_ID')
-if READER_ID is None:
-    raise ValueError("READER_ID environment variable not set")
-
-async def main():
-    print("started!")
-    minionConnection1 = AsyncLettaMinion(LETTA_API_TOKEN, MINION_ID1)
-    await minionConnection1.connect_agent()
-    minionConnection2 = AsyncLettaMinion(LETTA_API_TOKEN, MINION_ID2)
-    await minionConnection2.connect_agent()
-
-    
+# READER_ID = os.environ.get('READER_ID')
+# if READER_ID is None:
+#     raise ValueError("READER_ID environment variable not set")
 
 
+async def run_minion_async(minion_id, data):
+    minion = AsyncLettaMinion(LETTA_API_TOKEN, minion_id)
+    await minion.connect_agent()
+    await minion.save_deals(*data)  # <- await it!
 
+def run_minion_thread(minion_id, data):
+    # Each thread runs its own asyncio event loop
+    asyncio.run(run_minion_async(minion_id, data))
 
-asyncio.run(main())
+MINION_IDS = [os.environ[f"MINION_ID{i}"] for i in range(1, 11)]
+
+FAKE_DATA = [
+    ["TP Tea", "Berkeley"],
+    ["Sharetea", "Berkeley"],
+    ["Boba Guys", "Berkeley"],
+    ["Quickly", "Berkeley"],
+    ["Gong Cha", "Berkeley"],
+    ["Happy Lemon", "Berkeley"],
+    ["Tea Era", "Berkeley"],
+    ["Tiger Sugar", "Berkeley"],
+    ["Cha For Tea", "Berkeley"],
+    ["CoCo Fresh Tea & Juice", "Berkeley"]
+]
+
+# Async function for one minion
+async def run_minion_async(minion_id, data):
+    minion = AsyncLettaMinion(LETTA_API_TOKEN, minion_id)
+    await minion.connect_agent()
+    await minion.save_deals(*data)
+
+# Thread wrapper
+def run_minion_thread(minion_id, data):
+    asyncio.run(run_minion_async(minion_id, data))
+
+# Create and start threads
+threads = []
+for minion_id, data in zip(MINION_IDS, FAKE_DATA):
+    t = threading.Thread(target=run_minion_thread, args=(minion_id, data))
+    threads.append(t)
+    t.start()
+
+# Wait for all threads
+for t in threads:
+    t.join()
+
+print("All 10 minions connected and data saved!")
