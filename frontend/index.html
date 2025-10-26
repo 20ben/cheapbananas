@@ -876,7 +876,7 @@
 
             try {
               // Wait for the fetch to complete
-              const response = await fetch('http://127.0.0.1:5000/submit_location', {
+              const response = await fetch("http://localhost:5000/submit_location", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ lat: newLat, lng: newLng })

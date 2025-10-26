@@ -70,7 +70,7 @@ class AsyncLettaReader:
             # This is still synchronous and safe to use
             args = json.loads(last_call)
             
-            result['name'] = args['name']
+            result['name'] = place_name
             result['deals'] = args['deals']
             
             return result

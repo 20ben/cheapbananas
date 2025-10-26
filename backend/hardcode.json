@@ -1,0 +1,156 @@
+{
+  "Elaichi Co.": [
+    {
+      "deal_type": "First-time customer offer",
+      "description": "New customers get 10% off first purchase",
+      "price_discount": "10% off",
+      "availability": "Ongoing",
+      "source": "https://elaichico.com/"
+    },
+    {
+      "deal_type": "Shipping promotion",
+      "description": "Free delivery for orders exceeding $50",
+      "price_discount": "Free shipping (value varies)",
+      "availability": "Ongoing",
+      "source": "https://elaichico.com/"
+    }
+  ],
+  "Victory Point Cafe": [
+    {
+      "deal_type": "Daily recurring offer",
+      "description": "Happy hour pricing on select beverages",
+      "price_discount": "Varies by item",
+      "availability": "Daily (check for specific times)",
+      "source": "https://www.yelp.com/biz/victory-point-cafe-berkeley"
+    },
+    {
+      "deal_type": "Regular pricing",
+      "description": "$8 for unlimited board game play all day",
+      "price_discount": "$8 flat rate",
+      "availability": "Daily during operating hours",
+      "source": "https://www.victorypointcafe.com/"
+    }
+  ],
+  "McDonald's": [
+    {
+      "deal_type": "Limited-time offer",
+      "description": "Choice of McChicken® or McDouble® with 4-piece McNuggets, small fries, and soft drink",
+      "price_discount": "$5 (McDouble may be $5.50-$6 in some areas)",
+      "availability": "Through December 2025",
+      "source": "https://www.mcdonalds.com/us/en-us/deals.html"
+    },
+    {
+      "deal_type": "All-day recurring offer",
+      "description": "Buy select items, add second for $1. Includes: McChicken, Double Cheeseburger, 6-piece McNuggets, Small Fries (breakfast: Sausage McMuffin, Sausage Biscuit, Sausage Burrito, Hash Browns)",
+      "price_discount": "Second item for $1",
+      "availability": "Ongoing (excludes delivery)",
+      "source": "https://www.mcdonalds.com/us/en-us/deals.html"
+    },
+    {
+      "deal_type": "Weekly app-exclusive offer",
+      "description": "Free medium fries with any $1+ purchase through app",
+      "price_discount": "Free medium fries (value ~$3)",
+      "availability": "Every Friday through December 31, 2025",
+      "source": "https://www.mcdonalds.com/us/en-us/deals.html"
+    },
+    {
+      "deal_type": "First-time customer offer",
+      "description": "$5 off first order when downloading McDonald's app",
+      "price_discount": "$5 off",
+      "availability": "Ongoing for new users",
+      "source": "https://www.retailmenot.com/view/mcdonalds.com"
+    },
+    {
+      "deal_type": "Limited-time promotion",
+      "description": "Chance to win free food, cash, tech prizes with qualifying purchases",
+      "price_discount": "Various prizes and instant wins",
+      "availability": "Through November 24, 2025",
+      "source": "https://www.retailmenot.com/view/mcdonalds.com"
+    }
+  ],
+  "Binge Coffee House": [
+    {
+      "deal_type": "Limited-time collaboration offer",
+      "description": "Seasonal drink with ceremonial matcha, choice of milk, topped with house-made pumpkin pie cream",
+      "price_discount": "Use code BCEC (specific discount amount not specified)",
+      "availability": "Through end of October 2025 only (this week)",
+      "source": "https://www.instagram.com/p/DQCtMEwEk3j/"
+    }
+  ],
+  "U :Dessert Story": [
+    {
+      "deal_type": "Daily recurring offer",
+      "description": "10% off during Happy Hour",
+      "price_discount": "10% off",
+      "availability": "Monday - Friday (specific times not specified, call to confirm)",
+      "source": "https://www.yelp.com/biz/u-dessert-story-berkeley-2"
+    },
+    {
+      "deal_type": "Delivery offer",
+      "description": "In-house delivery with flat rate shipping",
+      "price_discount": "$3.99 flat rate (may save $3-7 compared to third-party delivery apps)",
+      "availability": "Ongoing",
+      "source": "https://order.toasttab.com/online/u-dessert-story-berkeley-1849-shattuck-ave"
+    }
+  ],
+  "Asha Tea House": [
+    {
+      "deal_type": "Limited-time offer",
+      "description": "20% off matcha, whole leaf teas, Asha merchandise & Minetti Design tea ware through December 31st",
+      "price_discount": "20% off",
+      "availability": "Through December 31, 2025",
+      "source": "https://www.facebook.com/ashateahouse/"
+    },
+    {
+      "deal_type": "Ongoing subscription offer",
+      "description": "Save on matcha and whole leaf tea subscriptions",
+      "price_discount": "Subscription discounts (amount varies)",
+      "availability": "Ongoing",
+      "source": "https://ashateahouse.com/"
+    },
+    {
+      "deal_type": "First-time customer offer",
+      "description": "Use code ASHA15 for 15% off first online order",
+      "price_discount": "15% off",
+      "availability": "Ongoing for new customers",
+      "source": "https://asha.tenereteam.com/coupons"
+    }
+  ],
+  "Blue Bottle Coffee": [
+    {
+      "deal_type": "First-time customer offer",
+      "description": "Save up to 15% when you subscribe to your favorite coffee",
+      "price_discount": "Up to 15% off",
+      "availability": "October 2025",
+      "source": "https://couponfollow.com/site/bluebottlecoffee.com"
+    },
+    {
+      "deal_type": "Limited-time offer",
+      "description": "Take up to 20% off with discount code ON5",
+      "price_discount": "20% off",
+      "availability": "October 2025",
+      "source": "https://couponfollow.com/site/bluebottlecoffee.com"
+    },
+    {
+      "deal_type": "First-time customer offer",
+      "description": "Get your first bag for just $5 when you sign up for subscription",
+      "price_discount": "First bag $5 (regular $20+)",
+      "availability": "Ongoing",
+      "source": "https://couponfollow.com/site/bluebottlecoffee.com"
+    },
+    {
+      "deal_type": "Free shipping offer",
+      "description": "Complimentary shipping on orders $40 or more",
+      "price_discount": "Free shipping (value $5-10)",
+      "availability": "Ongoing",
+      "source": "https://couponfollow.com/site/bluebottlecoffee.com"
+    },
+    {
+      "deal_type": "Limited-time offer",
+      "description": "Get 15% off your purchase with code l15",
+      "price_discount": "15% off",
+      "availability": "October 2025",
+      "source": "https://couponfollow.com/site/bluebottlecoffee.com"
+    }
+  ]
+}

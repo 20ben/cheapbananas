@@ -7,6 +7,7 @@ import asyncio
 import threading
 import time
 import logging
+import json
 
 # Configure logging
 logging.basicConfig(
@@ -141,6 +142,10 @@ class LettaManager:
 
         data = {}
         for r in restaurant_data:
-            deals = await reader.read_deals(r[0], r[1])
-            data.update(deals)
+            deals_info = await reader.read_deals(r[0], r[1])
+            if deals_info:  # ignore empty dicts
+                name = deals_info['name']
+                deals = deals_info['deals']
+                data[name] = deals  # store deals by restaurant name
+
         return data
