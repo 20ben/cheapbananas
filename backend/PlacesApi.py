@@ -64,6 +64,12 @@ def getNearbyRestaurants(latitude, longitude, radius=500.0):
         status = get_today_hours(place)
         photo = place["photos"][0]["name"]
         photo_url = photo_url = f"https://places.googleapis.com/v1/{photo}/media?maxWidthPx=200&key={PLACES_API_KEY}"
-        result.append([place["displayName"]["text"], place.get("formattedAddress", "N/A"), place.get("location"), place.get("rating"), status, photo_url, place.get("primaryTypeDisplayName")["text"]])
+        result.append([place["displayName"]["text"], 
+                       place.get("formattedAddress", "N/A"), 
+                       place.get("location"), 
+                       place.get("rating"), 
+                       status, 
+                       photo_url, 
+                       place.get("primaryTypeDisplayName")["text"]])
 
     return result
