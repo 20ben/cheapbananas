@@ -60,7 +60,6 @@ def submit_location():
     # Process the data (here we just print it)
     print("Received data:", data)
 
-    
     # Return a response
     return jsonify({
         'message': 'Data received successfully',
