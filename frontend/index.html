@@ -479,80 +479,7 @@
         // ============================================================================
         // DATA
         // ============================================================================
-        const locationData = [
-            {
-                id: "1",
-                name: "Blue Bottle Coffee",
-                category: "Cafe",
-                address: "66 Mint St, San Francisco, CA 94103",
-                rating: 4.5,
-                hours: "Open · Closes 6:00 PM",
-                imageUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=100&h=100&fit=crop"
-            },
-            {
-                id: "2",
-                name: "Golden Gate Park",
-                category: "Park",
-                address: "Golden Gate Park, San Francisco, CA 94122",
-                rating: 4.8,
-                hours: "Open 24 hours",
-                imageUrl: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop"
-            },
-            {
-                id: "3",
-                name: "Ferry Building Marketplace",
-                category: "Shopping",
-                address: "1 Ferry Building, San Francisco, CA 94111",
-                rating: 4.6,
-                hours: "Open · Closes 7:00 PM",
-                imageUrl: "https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?w=100&h=100&fit=crop"
-            },
-            {
-                id: "4",
-                name: "Tartine Bakery",
-                category: "Bakery",
-                address: "600 Guerrero St, San Francisco, CA 94110",
-                rating: 4.7,
-                hours: "Open · Closes 5:00 PM",
-                imageUrl: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=100&h=100&fit=crop"
-            },
-            {
-                id: "5",
-                name: "Exploratorium",
-                category: "Museum",
-                address: "Pier 15, San Francisco, CA 94111",
-                rating: 4.6,
-                hours: "Open · Closes 5:00 PM",
-                imageUrl: "https://images.unsplash.com/photo-1560264280-88b68371db39?w=100&h=100&fit=crop"
-            },
-            {
-                id: "6",
-                name: "Fisherman's Wharf",
-                category: "Tourist Attraction",
-                address: "Jefferson St, San Francisco, CA 94133",
-                rating: 4.4,
-                hours: "Open 24 hours",
-                imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=100&h=100&fit=crop"
-            },
-            {
-                id: "7",
-                name: "Zazie Restaurant",
-                category: "Restaurant",
-                address: "941 Cole St, San Francisco, CA 94117",
-                rating: 4.5,
-                hours: "Open · Closes 9:00 PM",
-                imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=100&h=100&fit=crop"
-            },
-            {
-                id: "8",
-                name: "Alamo Square Park",
-                category: "Park",
-                address: "Hayes St & Steiner St, San Francisco, CA 94117",
-                rating: 4.7,
-                hours: "Open 24 hours",
-                imageUrl: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=100&h=100&fit=crop"
-            }
-        ];
+        const locationData = [];
 
         // ============================================================================
         // GLOBAL STATE
@@ -1209,7 +1136,7 @@
                 // Create location object from your Python API data
                 const locationObject = {
                   name: loc[0], // displayName from your API
-                  category: 'Restaurant',
+                  category: loc[6],
                   address: loc[1], // formattedAddress from your API
                   hours: loc[4],
                   rating: loc[3],
