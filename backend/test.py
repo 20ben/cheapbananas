@@ -15,24 +15,7 @@ client = bdclient(api_token=BRIGHTDATA_API_TOKEN) # can also be defined as BRIGH
 # )
 
 # Basic extraction (URL in query)
-result = client.extract("Extract news headlines from CNN.com")
+result = client.search("Find deals for Insommia Cookies in Berkeley")
+
 print(result)
-
-# Using URL parameter with structured output
-schema = {
-    "type": "object",
-    "properties": {
-        "headlines": {
-            "type": "array",
-            "items": {"type": "string"}
-        }
-    },
-    "required": ["headlines"]
-}
-
-result = client.extract(
-    query="Extract main headlines",
-    url="https://cnn.com",
-    output_scheme=schema
-)
-print(result)  # Returns structured JSON matching the schema
+print(client.parse_content(result))  # Returns structured JSON matching the schema

@@ -4,6 +4,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS  # allows frontend to call backend
 import datetime
+from PlacesApi import getNearbyRestaurants
 
 x = datetime.datetime.now()
 
@@ -67,11 +68,7 @@ def submit_location():
     # Process the data (here we just print it)
     print("Received data:", data)
 
-    # Return a response
-    return jsonify({
-        'message': 'Data received successfully',
-        'received': data
-    }), 200
+    return jsonify(getNearbyRestaurants(data.get("lat"), data.get("lng")))
 
 # Running app
 if __name__ == '__main__':
