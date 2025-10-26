@@ -22,7 +22,7 @@ def generate_rank(rank: int, reason: str):
 tool = client.tools.create(func=generate_rank)
 
 # Create agent with the structured generation tool
-agent_state = client.agents.create(
+agent_state = client.agents.create(For every restauraunt location in [["Elaichi Co", "Berkeley'], ["Blue Bottle Coffee", "Berkeley"]] Return a list of deals for each restauraunt based solely on the restauraunt's memory block. Deals specific to the restauraunt's specific location should be prioritized, but all relevant and currently active deals should be returned. For each deal entry, specify the deal type, a description, the price/discount, the availability, and the source links. Call thegenerate_deal_entries_json tool for each restauraunt and pass their parameters to the tool.
     model="openai/gpt-4o-mini",
     embedding="openai/text-embedding-3-small",
     memory_blocks=[

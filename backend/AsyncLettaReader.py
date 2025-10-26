@@ -46,7 +46,9 @@ class AsyncLettaReader:
 
     
     # Define method as asynchronous
-    async def read_deals(self, place_name, place_location):
+    async def read_deals(self, place_names, place_locations):
+        name_location2D = [[place_names[i], place_locations[i]] for i in range(len(place_names))]
+
         
         # Use await for the asynchronous client call
         response = await self.client.agents.messages.create(
@@ -54,26 +56,32 @@ class AsyncLettaReader:
             messages=[
         {
             "role": "system",
-            "content": f"Return a list of deals for {place_name} based solely on the restauraunt's memory block. Deals specific to {place_name} in {place_location} should be prioritized, but all relevant and currently active deals should be returned. For each deal entry, specify the deal type, a description, the price/discount, the availability, and the source links. At the end, pass the arguments to the generate_deal_entries_json tool."
+            "content": f"For every restauraunt location in {name_location2D} Return a list of deals for each restauraunt based solely on the restauraunt's memory block. Deals specific to the restauraunt's specific location should be prioritized, but all relevant and currently active deals should be returned. For each deal entry, specify the deal type, a description, the price/discount, the availability, and the source links. Call the generate_deal_entries_json tool for each restauraunt and pass their parameters to the tool. Pass them to the tool in the order they appeared in the list."
+            # "content": f"Return a list of deals for {place_name} based solely on the restauraunt's memory block. Deals specific to {place_name} in {place_location} should be prioritized, but all relevant and currently active deals should be returned. For each deal entry, specify the deal type, a description, the price/discount, the availability, and the source links. At the end, pass the arguments to the generate_deal_entries_json tool."
         }])
 
-        result = {}
-        last_call = None
+        calls = []
+        
 
+        i = 0
         for message in response.messages:
             if message.message_type == "tool_call_message":
                 # Ensure we handle the possibility of multiple tool calls and take the last one
-                last_call = message.tool_call.arguments
+                currdict = json.loads(message.tool_call.arguments)
+                if 'deals' in currdict:
+                    currdict['name'] = place_names[i]
+                    calls.append(currdict)
+                    i += 1
+                 
                 
-        if last_call:
-            print(last_call)
+        return calls
             # This is still synchronous and safe to use
-            args = json.loads(last_call)
+        # args = json.loads(last_call)
             
-            result['name'] = place_name
-            result['deals'] = args['deals']
+        # result['name'] = place_name
+        # result['deals'] = args['deals']
             
-            return result
+        # return result
         
         # Return an empty dict if no tool call message was found
-        return {}
+        # return {}
