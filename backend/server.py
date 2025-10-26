@@ -10,20 +10,45 @@ x = datetime.datetime.now()
 # Initializing flask app
 app = Flask(__name__)
 
+# Allow all routes to be accessed from any origin (development)
+CORS(app)
 
 # Route for sending data
-@app.route('/data')
+@app.route('/api/data')
 def output_deals():
 
     # Letta agent call here...
+    fake_data = {
+    'name': "Insomnia Cookies",
+    'deals': [
+        {
+            "Deal Type": "Double Dozen Deal",
+            "Description": "24 Classic Cookies",
+            "Price/Discount": "$22",
+            "Availability": "Pickup Only",
+            "Source": "https://instagram.com"
+        },
+        {
+            "Deal Type": "Cookiewich",
+            "Description": "Ice Cream Sandwich",
+            "Price/Discount": "$4",
+            "Availability": "Pickup Only",
+            "Source": "https://instagram.com"
+        },
+        {
+            "Deal Type": "Free Cookie On Signup",
+            "Description": "Free classic cookie on signup",
+            "Price/Discount": "Free on signup",
+            "Availability": "Online Order",
+            "Source": "https://instagram.com"
+        }]
+    }
 
     # Returning an api for showing in  reactjs
-    return {
-        'name':"Insommia Cookies", 
-        "Deal":"Cookiewich",
-        "Description": "...", 
-        "Source":"https://instagram.com/post/postid"
-        }
+    return jsonify(fake_data)
+
+
+
 
 # Route for receiving data from frontend... tbd on frontend side
 @app.route('/submit_location', methods=['POST'])
