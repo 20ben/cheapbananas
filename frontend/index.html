@@ -814,7 +814,35 @@
             strictBounds: true,
           });
           autocomplete.addListener('place_changed', () => {
+            
             const place = autocomplete.getPlace();
+            const newLat = place.geometry.location.lat()
+            const newLng = place.geometry.location.lng() 
+
+            console.log(newLat);
+
+            // hardcoding for now
+            fetch('http://127.0.0.1:5000/submit_location', {
+                // sending lat and long to server.py 
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ lat: newLat, lng: newLng })
+                })
+                .then(response => response.json())
+                .then(result => {
+                  // do stuff
+                  myLocations = result;
+
+                })
+                .catch(error => console.error('Error:', error));
+              
+            // Need to Recenter person so that they are at the place that the user entered.
+            // TODO
+            
+            widget.map.panTo({lat: newLat, lng: newLng});
+            widget.map.setZoom(18); // optional, zoom closer to user
+            
+            
             widget.placeIdsToAutocompleteResults.set(place.place_id, place);
             widget.selectPlaceById(place.place_id, /* panToMarker= */ true);
             searchInputEl.value = '';
@@ -887,7 +915,9 @@
                 })
                 .then(response => response.json())
                 .then(result => {
-                  console.log('Response from Python:', result);
+                  // do stuff
+                  myLocations = result;
+
                 })
                 .catch(error => console.error('Error:', error));
 
@@ -931,11 +961,7 @@
         "mapsApiKey": "AIzaSyAn4h2aJ5gzIUxOdaxun2I01Y_rpl4Vd3Q",
       };
 
-      const myLocations = [
-        {lat: 37.800000, lng: -122.448000},
-        {lat: 37.805000, lng: -122.464000},
-        {lat: 37.810000, lng: -122.478000},
-      ];
+      let myLocations = [];
 
       function initMap() {
         if ('geolocation' in navigator) {
