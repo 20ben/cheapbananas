@@ -2,12 +2,13 @@
 
 # Import flask and datetime module for showing date and time
 from flask import Flask, request, jsonify, Response, stream_with_context
-from flask_cors import CORS  # allows frontend to call backend
+from flask_cors import CORS, cross_origin  # allows frontend to call backend
 import datetime
 from PlacesApi import getNearbyRestaurants
 import time
 from LettaManager import LettaManager
 import asyncio
+import json
 
 x = datetime.datetime.now()
 
@@ -16,6 +17,8 @@ app = Flask(__name__)
 
 # Allow all routes to be accessed from any origin (development)
 CORS(app)
+CORS(app, origins=["http://localhost:5173"])
+
 
 # Route for sending data
 @app.route('/api/data')
@@ -59,92 +62,45 @@ def output_deals():
 
     # Returning an api for showing in  reactjs
     return jsonify(fake_data)
-'''
-@app.route('/submit_location_stream', methods=['POST'])
-def submit_location_stream():
-    """
-    Stream restaurant results as they complete
-    Uses Server-Sent Events (SSE)
-    """
-    data = request.get_json()
-    lat = data.get("lat")
-    lng = data.get("lng")
-    
-    logger.info(f"Streaming request for lat={lat}, lng={lng}")
-    
-    def generate():
-        """Generator function that yields SSE-formatted data"""
-        try:
-            # Get nearby restaurants
-            nearbyRestaurants = getNearbyRestaurants(lat, lng)
-            
-            if not nearbyRestaurants:
-                yield f"data: {json.dumps({'type': 'error', 'message': 'No restaurants found'})}\n\n"
-                return
-            
-            # Send initial count
-            yield f"data: {json.dumps({'type': 'init', 'total': len(nearbyRestaurants)})}\n\n"
-            
-            # Prepare data for processing
-            restaurant_data = [
-                {
-                    'index': idx,
-                    'name': resta[0],
-                    'location': resta[1],
-                    'raw_data': resta
-                }
-                for idx, resta in enumerate(nearbyRestaurants[:10])
-            ]
-            
-            # Process and stream results
-            for result in process_restaurants_streaming(restaurant_data):
-                # Send each result as it completes
-                yield f"data: {json.dumps(result)}\n\n"
-            
-            # Send completion signal
-            yield f"data: {json.dumps({'type': 'complete'})}\n\n"
-            
-        except Exception as e:
-            logger.error(f"Streaming error: {str(e)}", exc_info=True)
-            yield f"data: {json.dumps({'type': 'error', 'message': str(e)})}\n\n"
-    
-    return Response(
-        stream_with_context(generate()),
-        mimetype='text/event-stream',
-        headers={
-            'Cache-Control': 'no-cache',
-            'X-Accel-Buffering': 'no',  # Disable nginx buffering
-            'Connection': 'keep-alive'
-        }
-    )
-'''
 
 # Route for receiving data from frontend... tbd on frontend side
+
 @app.route('/submit_location', methods=['POST'])
+@cross_origin(origin="http://localhost:5173")
 def submit_location():
     data = request.get_json()  # Get JSON data from request
     
     # Process the data (here we just print it)
     print("Received data:", data)
 
-    results = {}
+    result = None
     nearbyRestaurants = getNearbyRestaurants(data.get("lat"), data.get("lng"))
     if nearbyRestaurants:
 
         restas = [r[:2] for r in nearbyRestaurants]
         
-        manager = LettaManager()
-        result = asyncio.run(manager.process_restaurants(restas))
-        results.update(result)
-    
-    print(results)
+        #manager = LettaManager()
+        #result = asyncio.run(manager.process_restaurants(restas))
+        result = None
 
-    return jsonify(results)
+        with open("hardcode.json", "r") as f:
+            result = json.load(f)
+
+        nearbyRestaurants.sort(key=lambda x: x[0])
 
 
-        
+    # Step 1: Append deals to each restaurant if they exist
+    merged = []
+    if nearbyRestaurants and result:
+        for r in nearbyRestaurants:
+            name = r[0]
+            deals = result.get(name, [])  # get deals if they exist, else empty list
+            merged.append(r + [deals])  # append deals as a new element at the end
 
-    return jsonify(nearbyRestaurants)
+    # # merged now contains the restaurants with deals at the end
+    # print(merged)
+    print(merged)
+    return jsonify(merged)
 
 # Running app
 if __name__ == '__main__':
