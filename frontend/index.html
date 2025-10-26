@@ -1045,6 +1045,7 @@
     <script>
       let map;
       let markers = [];
+      let autocomplete;
 
       // Render sidebar locations
       function renderLocationList(locations) {
@@ -1141,6 +1142,112 @@
         const map = new google.maps.Map(document.getElementById("map"), {
             zoom: 12,
             center: center
+        });
+
+        // Add this RIGHT AFTER you create the map variable
+        // Initialize Places Autocomplete
+        const input = document.getElementById('searchInput');
+        autocomplete = new google.maps.places.Autocomplete(input, {
+            fields: ['place_id', 'geometry', 'name', 'formatted_address', 'types']
+        });
+
+        // Listen for place selection
+        autocomplete.addListener('place_changed', async () => {
+            const place = autocomplete.getPlace();
+            const newLat = place.geometry.location.lat()
+            const newLng = place.geometry.location.lng() 
+
+            try {
+              // Wait for the fetch to complete
+              const response = await fetch('http://127.0.0.1:5000/submit_location', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lat: newLat, lng: newLng })
+              });
+              
+              const result = await response.json();
+              myLocations = result
+
+              if (!place.geometry || !place.geometry.location) {
+                  console.log("No details available for input: '" + place.name + "'");
+                  return;
+              }
+
+              // Pan to the selected place
+              map.panTo(place.geometry.location);
+              map.setZoom(15);
+
+              // Add a marker for the selected place
+              new google.maps.Marker({
+                  position: place.geometry.location,
+                  map: map,  // ✓ Already correct
+                  title: place.name,
+                  icon: {
+                      path: google.maps.SymbolPath.CIRCLE,
+                      scale: 10,
+                      fillColor: "#4285F4",
+                      fillOpacity: 1,
+                      strokeWeight: 2,
+                      strokeColor: "white",
+                  }
+              });
+
+              // Clear the input after selection
+              input.value = '';
+
+              const bounds = new google.maps.LatLngBounds();
+              
+              // Clear existing location data and markers
+              locationData.length = 0;
+              markers.forEach(m => m.setMap(null));
+              markers = [];
+
+              myLocations.forEach(loc => {
+                const latLng = new google.maps.LatLng(loc[2].latitude, loc[2].longitude);
+                bounds.extend(latLng);
+
+                // Create location object from your Python API data
+                const locationObject = {
+                  name: loc[0], // displayName from your API
+                  category: 'Restaurant',
+                  address: loc[1], // formattedAddress from your API
+                  hours: loc[4],
+                  rating: loc[3],
+                  imageUrl: loc[5]
+                };
+
+                // Add to locationData array
+                locationData.push(locationObject);
+
+                // Create the red marker
+                const marker = new google.maps.Marker({
+                  position: latLng,
+                  map: map,
+                  title: loc[0],
+                  icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 8,
+                    fillColor: 'red',
+                    fillOpacity: 1,
+                    strokeWeight: 1,
+                    strokeColor: 'darkred'
+                  }
+                });
+
+                // Add click listener to marker
+                marker.addListener("click", () => selectLocation(locationObject));
+                
+                markers.push(marker);
+              });
+
+              // Re-render the location list with new data
+              renderLocationList(locationData);
+
+              map.fitBounds(bounds);  // CHANGE THIS: was widget.map, now just map
+              
+            } catch (error) {
+              console.error('Error:', error);
+            }
         });
 
         // Try to get user's location
