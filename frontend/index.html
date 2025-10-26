@@ -819,8 +819,6 @@
             const newLat = place.geometry.location.lat()
             const newLng = place.geometry.location.lng() 
 
-            console.log(newLat);
-
             // hardcoding for now
             fetch('http://127.0.0.1:5000/submit_location', {
                 // sending lat and long to server.py 
@@ -840,7 +838,7 @@
             // TODO
             
             widget.map.panTo({lat: newLat, lng: newLng});
-            widget.map.setZoom(18); // optional, zoom closer to user
+            //widget.map.setZoom(18); // optional, zoom closer to user
             
             
             widget.placeIdsToAutocompleteResults.set(place.place_id, place);
@@ -851,14 +849,19 @@
             const bounds = new google.maps.LatLngBounds();
 
             // Add the place from search
-            if (place.geometry && place.geometry.location) {
-              bounds.extend(place.geometry.location);
-            }
+            //if (place.geometry && place.geometry.location) {
+            //  bounds.extend(place.geometry.location);
+            //}
+
+            console.log("we go here first")
+            console.log(myLocations)
 
             // Add each red marker location
             myLocations.forEach(loc => {
               const latLng = new google.maps.LatLng(loc.lat, loc.lng);
               bounds.extend(latLng);
+
+              console.log("we go here")
 
               new google.maps.Marker({
                 position: latLng,
