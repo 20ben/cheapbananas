@@ -458,7 +458,17 @@
           mapOptions.restriction = {latLngBounds: widget.mapBounds};
           mapOptions.mapTypeControlOptions = {position: google.maps.ControlPosition.TOP_RIGHT};
           widget.map = new google.maps.Map(widgetEl.querySelector('.map'), mapOptions);
-          widget.map.fitBounds(widget.mapBounds, /* padding= */ 0);
+
+          // // Set initial zoom smaller
+          // widget.map.fitBounds(widget.mapBounds, {
+          //   padding: 0,
+          //   maxZoom: 12
+          // });
+
+          widget.map.setCenter(widget.center);
+          widget.map.setZoom(18);
+
+
           widget.map.addListener('click', (e) => {
             // Check if user clicks on a POI pin from the base map.
             if (e.placeId) {
@@ -511,7 +521,9 @@
           widget.addPlaceMarker = function(place) {
             place.marker = drawMarker(place.name, place.coords, '#EA4335', '#C5221F', place.icon);
             place.marker.addListener('click', () => void widget.selectPlaceById(place.placeId));
+            widget.updateBounds(widget.places);
           };
+          
 
           // Fit map to bounds that contain all markers of the specified Place objects.
           widget.updateBounds = function(places) {
@@ -804,7 +816,42 @@
             widget.placeIdsToAutocompleteResults.set(place.place_id, place);
             widget.selectPlaceById(place.place_id, /* panToMarker= */ true);
             searchInputEl.value = '';
+
+            // Optional: fit map to show search result + red markers
+            const bounds = new google.maps.LatLngBounds();
+
+            // Add the place from search
+            if (place.geometry && place.geometry.location) {
+              bounds.extend(place.geometry.location);
+            }
+
+            // Add each red marker location
+            myLocations.forEach(loc => {
+              const latLng = new google.maps.LatLng(loc.lat, loc.lng);
+              bounds.extend(latLng);
+
+              new google.maps.Marker({
+                position: latLng,
+                map: widget.map,
+                title: `Location: ${loc.lat}, ${loc.lng}`,
+                icon: {
+                  path: google.maps.SymbolPath.CIRCLE,
+                  scale: 8,
+                  fillColor: 'red',
+                  fillOpacity: 1,
+                  strokeWeight: 1,
+                  strokeColor: 'darkred'
+                }
+              });
+            });
+
+            // Fit map to include all markers
+            widget.map.fitBounds(bounds);
+
+            
+
           });
+
         }
 
         // Recenter map on user location
@@ -855,8 +902,14 @@
           "maxZoom":22,
           "minZoom":12,
           "mapId":""},
-        "mapsApiKey": "AIzaSyAn4h2aJ5gzIUxOdaxun2I01Y_rpl4Vd3Q"
+        "mapsApiKey": "AIzaSyAn4h2aJ5gzIUxOdaxun2I01Y_rpl4Vd3Q",
       };
+
+      const myLocations = [
+        {lat: 37.800000, lng: -122.448000},
+        {lat: 37.805000, lng: -122.464000},
+        {lat: 37.810000, lng: -122.478000},
+      ];      
 
       function initMap() {
         if ('geolocation' in navigator) {
