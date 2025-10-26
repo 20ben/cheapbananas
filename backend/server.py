@@ -20,6 +20,8 @@ def output_deals():
     # Letta agent call here...
     fake_data = {
     'name': "Insomnia Cookies",
+    'lat': 37.8, 
+    'lng': -122.448,
     'deals': [
         {
             "Deal Type": "Double Dozen Deal",
