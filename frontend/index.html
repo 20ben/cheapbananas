@@ -477,6 +477,7 @@
               widget.selectPlaceById(e.placeId);
             }
           });
+
           widget.map.addListener('zoom_changed', () => {
             // Customize map styling to show/hide default POI pins or text based on zoom level.
             const hideDefaultPoiPins = widget.map.getZoom() < ND_DEFAULT_POI_MIN_ZOOM;
@@ -846,22 +847,25 @@
               });
             });
 
+
             // Fit map to include all markers
             widget.map.fitBounds(bounds);
 
-            
+
 
           });
 
         }
 
-        // Function to fetch data.
-        const fetchDataBtn = document.getElementById('fetchBtn')
-        fetchDataBtn.addEventListener('click', () => {
-          const res = axios.get("http://127.0.0.1:5000/api/data")
-              .then(res => console.log(res.data))
-              .catch(err => console.error(err));
-        });
+        
+
+        // // Function to fetch data.
+        // const fetchDataBtn = document.getElementById('fetchBtn')
+        // fetchDataBtn.addEventListener('click', () => {
+        //   const res = axios.get("http://127.0.0.1:5000/api/data")
+        //       .then(res => console.log(res.data))
+        //       .catch(err => console.error(err));
+        // });
 
         // Recenter map on user location
         const locButton = document.getElementById('currentLocationBtn');
@@ -918,7 +922,7 @@
         {lat: 37.800000, lng: -122.448000},
         {lat: 37.805000, lng: -122.464000},
         {lat: 37.810000, lng: -122.478000},
-      ];      
+      ];
 
       function initMap() {
         if ('geolocation' in navigator) {
@@ -938,6 +942,33 @@
         } else {
           new NeighborhoodDiscovery(CONFIGURATION); // fallback if unsupported
         }
+
+        // // Handle Fetch Button Click
+        // const fetchDataBtn = document.getElementById('fetchBtn');
+        // fetchDataBtn.addEventListener('click', async () => {
+        //   try {
+        //     const res = await axios.get("http://127.0.0.1:5000/api/data");
+        //     const data = res.data;  // ← this is your list of lat/lng points
+
+        //     console.log("Fetched data:", data);
+
+        //     // Loop through each item and place a red marker
+        //     data.forEach(point => {
+        //       new google.maps.Marker({
+        //         position: { lat: point.lat, lng: point.lng },
+        //         map: map,
+        //         title: point.name,
+        //         icon: {
+        //           url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+        //         }
+        //       });
+        //     });
+
+        //   } catch (err) {
+        //     console.error("Error fetching data:", err);
+        //   }
+        // });
+
       }
     </script>
     <script id="nd-place-results-tmpl" type="text/x-handlebars-template">
@@ -1096,13 +1127,12 @@
             <input type="button"> -->
 
             <input class="place-search-input" placeholder="Search nearby places">
-            <button class="place-search-button">
+            <button class="place-search-button" id="fetchBtn">
               <img src="https://fonts.gstatic.com/s/i/googlematerialicons/search/v11/24px.svg" alt="search"/>
             </button>
             <button class="button" id="currentLocationBtn">
               <img src="https://fonts.gstatic.com/s/i/googlematerialicons/home/v11/24px.svg" alt="current location"/>
             </button>
-            <button id="fetchBtn">Get Data from Flask (TESTING)</button>
 
           </div>
         </header>
@@ -1133,5 +1163,11 @@
       </svg>
     </div>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAn4h2aJ5gzIUxOdaxun2I01Y_rpl4Vd3Q&callback=initMap&libraries=places,geometry&solution_channel=GMP_QB_neighborhooddiscovery_v3_cADEF" async defer></script>
+    
+
   </body>
+
+
+
+
 </html>
